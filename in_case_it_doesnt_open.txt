@@ -1,0 +1,16 @@
+LINUX (Ubuntu 16.04):
+
+	make sure that you have opened "PDBM" file, without extension
+	you can check what exactly failed by opening it through the console, "./PDBM" while in the right directory.
+	
+	try installiing that:
+	   sudo apt-get install libboost-python-dev python-dev libqt5core5a libqt5gui5 libqt5widgets5
+
+	if you want to compile it, run
+ 	   sudo apt-get install libgl1-mesa-dev libboost-all-dev python-dev qtcreator libclang-common-8-dev
+	and open .pro file
+
+LINUX (Ubuntu 20.04):
+
+	qtcreator spamming errors due to code analyzer being freaking blind:
+	sudo apt-get install libclang-common-8-dev

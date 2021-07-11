@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>img/undo.png</file>
+        <file>img/new.png</file>
+        <file>img/radbutoff.png</file>
+        <file>img/radbuton.png</file>
+    </qresource>
+</RCC>
