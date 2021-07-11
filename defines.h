@@ -2,9 +2,9 @@
 #define DEFINES_H
 
 
-//#define USE_CRYPTOPP
+#define USE_CRYPTOPP
 #ifndef USE_CRYPTOPP
-    //#define USE_PYTHON_CRYPTO
+    #define USE_PYTHON_CRYPTO
 #endif
 
 
@@ -28,7 +28,7 @@
 #endif
 #ifndef USE_CRYPTOPP
     #ifndef USE_PYTHON_CRYPTO
-        //Have_to_use_either_python_crypto_or_cryptopp;
+        Have_to_use_either_python_crypto_or_cryptopp;
     #endif
 #endif
 #endif // DEFINES_H
