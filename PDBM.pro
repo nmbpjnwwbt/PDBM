@@ -7,8 +7,11 @@
 QT       += core gui multimediawidgets
 
 CONFIG += c++11
+
+LIBS += -lboost_python38 -lboost_system -lpython3.8
+INCLUDEPATH += /usr/include/python3.8
 #LIBS += -L/usr/local/boost_1_61_0/libs -lboost_python -lboost_system -lpython2.7
-#LIBS += -l:libcryptopp.a
+LIBS += -L"$$PWD/lib" -l cryptopp
 #INCLUDEPATH += /usr/local/boost_1_61_0/boost /usr/include/python2.7
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

@@ -14,6 +14,9 @@
 
 #include <iostream>
 #include <iomanip>
+#include "cryptopp_headers/aes.h"
+#include "cryptopp_headers/modes.h"
+#include "cryptopp_headers/osrng.h"
 #ifdef USE_PYTHON_CRYPTO
     #include <boost/python.hpp>
 #endif

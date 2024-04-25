@@ -4,6 +4,10 @@
 #include <QLabel>
 #include <QDebug>
 
+typedef void* (*memset_t)(void*, int, size_t);
+
+void cleanse(std::string &in);
+
 class SiteButton: public QFrame{
     Q_OBJECT
 
@@ -13,7 +17,7 @@ class SiteButton: public QFrame{
 
         void mouseReleaseEvent(QMouseEvent *event);
         void setText(QString namein="name not loaded", QString descriptionin="desc. not loaded");
-        void setData(QString loginin, QString passwordin);
+        void setData(const QString &loginin, const QString &passwordin);
         std::string toSave();
         bool load(std::string &input);
 

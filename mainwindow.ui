@@ -318,12 +318,18 @@ QSplitter{
              <property name="text">
               <string>decrypt</string>
              </property>
+             <property name="autoDefault">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="6" column="0">
             <widget class="QPushButton" name="bruter">
              <property name="text">
               <string>brute</string>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -363,6 +369,9 @@ QSplitter{
              <property name="icon">
               <iconset resource="resources.qrc">
                <normaloff>:/img/img/undo.png</normaloff>:/img/img/undo.png</iconset>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -455,6 +464,9 @@ QSplitter{
              <property name="text">
               <string>refresh</string>
              </property>
+             <property name="autoDefault">
+              <bool>true</bool>
+             </property>
              <property name="flat">
               <bool>false</bool>
              </property>
@@ -470,6 +482,9 @@ QSplitter{
              </property>
              <property name="text">
               <string>open</string>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -540,6 +555,9 @@ QSplitter{
               <iconset resource="resources.qrc">
                <normaloff>:/img/img/undo.png</normaloff>:/img/img/undo.png</iconset>
              </property>
+             <property name="autoDefault">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="2" column="0">
@@ -609,6 +627,9 @@ QSplitter{
              </property>
              <property name="text">
               <string>done</string>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -723,7 +744,7 @@ QSplitter{
                 <x>0</x>
                 <y>0</y>
                 <width>143</width>
-                <height>68</height>
+                <height>69</height>
                </rect>
               </property>
               <property name="sizePolicy">
@@ -945,6 +966,9 @@ QSplitter{
              <property name="text">
               <string>generate</string>
              </property>
+             <property name="autoDefault">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="6" column="0">
@@ -1006,6 +1030,9 @@ QSplitter{
              <property name="text">
               <string>save</string>
              </property>
+             <property name="autoDefault">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -1047,6 +1074,9 @@ QSplitter{
              <property name="icon">
               <iconset resource="resources.qrc">
                <normaloff>:/img/img/new.png</normaloff>:/img/img/new.png</iconset>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1177,6 +1207,9 @@ background-color:#002d20;
               <iconset>
                <normaloff>img/new.png</normaloff>img/new.png</iconset>
              </property>
+             <property name="autoDefault">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="0" column="1">
@@ -1202,6 +1235,9 @@ background-color:#002d20;
              </property>
              <property name="text">
               <string>save</string>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1328,6 +1364,9 @@ background-color: transparent;
               <iconset resource="resources.qrc">
                <normaloff>:/img/img/undo.png</normaloff>:/img/img/undo.png</iconset>
              </property>
+             <property name="autoDefault">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="4" column="9">
@@ -1360,6 +1399,9 @@ background-color: transparent;
              </property>
              <property name="text">
               <string>encrypt and save</string>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1412,6 +1454,9 @@ background-color: transparent;
              </property>
              <property name="text">
               <string>generate</string>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1574,6 +1619,9 @@ background-color: #282810;</string>
              <property name="text">
               <string>reload</string>
              </property>
+             <property name="autoDefault">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item row="0" column="3">
@@ -1592,6 +1640,9 @@ background-color: #282810;</string>
              </property>
              <property name="text">
               <string>done</string>
+             </property>
+             <property name="autoDefault">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1653,12 +1704,18 @@ background-color: #282810;</string>
             <height>20</height>
            </size>
           </property>
+          <property name="autoDefault">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QPushButton" name="mainOrientationButton">
           <property name="text">
            <string>change orientation</string>
+          </property>
+          <property name="autoDefault">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

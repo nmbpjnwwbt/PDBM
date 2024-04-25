@@ -48,6 +48,12 @@ std::string str_to_hex(std::string in){
     return out;
 }
 
+#ifdef USE_PYTHON_CRYPTO
+    inline  boost::python::object to_pyBytes(const char *in){ return boost::python::object(boost::python::handle<>(PyBytes_FromString(in)));}
+    inline  boost::python::object to_pyBytes(const char *in, __ssize_t len){ return boost::python::object(boost::python::handle<>(PyBytes_FromStringAndSize(in, len)));}
+    inline  boost::python::object to_pyBytes(const std::string &in){ return boost::python::object(boost::python::handle<>(PyBytes_FromStringAndSize(in.c_str(), in.length())));}
+#endif
+
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow){
     path=QCoreApplication::applicationFilePath().toStdString();
     path=path.substr(0,path.rfind('/')+1);
@@ -93,10 +99,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     ASCIIonlyValidator=static_cast<QValidator*>(new QRegExpValidator(QRegExp("[ -~]*")));
     HexaValidator=static_cast<QValidator*>(new QRegExpValidator(QRegExp("([0-9]|[A-F]|[a-f])*")));
-    mainGraphicsScene=new QGraphicsScene2();
+    mainGraphicsScene=new QGraphicsScene2(this);
     mainGraphicsScene->mainView=ui->graphicsView;
     ui->graphicsView->setScene(mainGraphicsScene);
-    mediaPlayer=new QMediaPlayer;
+    mediaPlayer=new QMediaPlayer(this);
     mediaPlayer->setVideoOutput(ui->videoWidget);
     mediaPlayer->setMedia(0);
 
@@ -110,6 +116,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 }
 MainWindow::~MainWindow(){
     delete ui;
+    delete ASCIIonlyValidator;
+    delete HexaValidator;
 }
 
 
@@ -498,9 +506,9 @@ int MainWindow::on_decryptButton_clicked_decrypt(){
         password=str_from_hex(password);
         #ifdef USE_PYTHON_CRYPTO
             boost::python::exec("iv='test'\ntoDecrypt='test'\nkey='test'", main_namespace);
-            main_namespace["toDecrypt"]=boost::python::object(input);
-            main_namespace["key"]=     boost::python::object(password);
-            main_namespace["iv"]=      boost::python::object(input.substr(0, 16));
+            main_namespace["toDecrypt"]=to_pyBytes(input);
+            main_namespace["key"]=      to_pyBytes(password);
+            main_namespace["iv"]=       to_pyBytes(input.substr(0, 16));
             try{
                 input=std::string(boost::python::extract<std::string>(boost::python::eval(
                         ("AES.new(key, AES.MODE_CFB, iv, segment_size="+
@@ -524,7 +532,7 @@ int MainWindow::on_decryptButton_clicked_decrypt(){
             input.erase(0, 16);
             for(uint8_t *i=strbuf, *end=strbuf+input.length()+1; i<end; i++)
                 *i='0';
-            delete strbuf;
+            delete[] strbuf;
 
         #endif
     }
@@ -579,10 +587,10 @@ int MainWindow::on_decryptButton_clicked_encrypt(){
         }
         password=str_from_hex(password);
         #ifdef USE_PYTHON_CRYPTO
-            boost::python::exec("iv=Random.new().read(16)\ntoEncrypt='test'\nkey='test'", main_namespace);
+            boost::python::exec("iv=Random.new().read(16)\ntoEncrypt=b'test'\nkey=b'test'", main_namespace);
             addPadding(filedata);
-            main_namespace["toEncrypt"]=boost::python::object(filedata);
-            main_namespace["key"]=     boost::python::object(password);
+            main_namespace["toEncrypt"]=to_pyBytes(filedata);
+            main_namespace["key"]=      to_pyBytes(password);
             try{
                 filedata=boost::python::extract<std::string>(boost::python::eval(
                         ("iv+AES.new(key, AES.MODE_CFB, iv, segment_size="+
@@ -590,8 +598,9 @@ int MainWindow::on_decryptButton_clicked_encrypt(){
                            ").encrypt(toEncrypt)"
                         ).c_str(),
                         main_namespace));
-                boost::python::exec("toEncrypt='done'\nkey='done'", main_namespace);
+                boost::python::exec("toEncrypt=b'done'\nkey=b'done'", main_namespace);
             }catch(boost::python::error_already_set const&){
+                ui->codingErrorDisplay->setText("Python crash. Details in console.");
                 PyErr_Print();
                 return 1;
             }
@@ -609,7 +618,7 @@ int MainWindow::on_decryptButton_clicked_encrypt(){
             filedata.replace(16, filedata.length()-16, reinterpret_cast<const char*>(strbuf), filedata.length()-16);
             for(uint8_t *i=strbuf, *end=strbuf+filedata.length()-15; i<end; i++)
                 *i='0';
-            delete strbuf;
+            delete[] strbuf;
         #endif
     }
     std::fstream file;
@@ -955,9 +964,9 @@ void MainWindow::on_bruter_clicked(){// remove hiding in constructor. NOT MAINTA
         //password2[  ]=i&
         #ifdef USE_PYTHON_CRYPTO
             boost::python::exec("iv='test'\ntoDecrypt='test'\nkey='test'", main_namespace);
-            main_namespace["toDecrypt"]=boost::python::object(input);
-            main_namespace["key"]=     boost::python::object(password2);
-            main_namespace["iv"]=      boost::python::object(input.substr(0, 16));
+            main_namespace["toDecrypt"]=to_pyBytes(input);
+            main_namespace["key"]=      to_pyBytes(password2);
+            main_namespace["iv"]=       to_pyBytes(input.substr(0, 16));
             try{
                 result=std::string(boost::python::extract<std::string>(boost::python::eval("AES.new(key, AES.MODE_CFB, iv).decrypt(toDecrypt)", main_namespace))).substr(16);
                 boost::python::exec("toDecrypt='done'\nkey='done'", main_namespace);

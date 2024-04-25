@@ -1,6 +1,15 @@
 #include "guiclasses/sitebutton.h"
 #include <QGridLayout>
 
+static volatile memset_t memset_func = memset; // so that it's not optimised out
+
+void cleanse(std::string &in){ // making absolutely sure no data is left in freed memory
+
+    in.resize(in.capacity(), 0);
+    memset_func(&in[0], 0, in.size());
+}
+
+
 SiteButton::SiteButton(QWidget *parent, QString namein, QString descin): QFrame(parent){
     setLayout(new QGridLayout(this));
     name=new QLabel(this);
@@ -15,7 +24,7 @@ SiteButton::SiteButton(QWidget *parent, QString namein, QString descin): QFrame(
 }
 SiteButton::~SiteButton(){
     for(uint32_t i=0; i<4; i++){
-
+        cleanse(rawdata[i]);
     }
 }
 
@@ -30,7 +39,7 @@ void SiteButton::setText(QString namein, QString descriptionin){
     rawdata[0]=namein.toStdString();
     rawdata[1]=descriptionin.toStdString();
 }
-void SiteButton::setData(QString loginin, QString passwordin){
+void SiteButton::setData(const QString &loginin, const QString &passwordin){
     rawdata[2]=loginin.toStdString();
     rawdata[3]=passwordin.toStdString();
 }
