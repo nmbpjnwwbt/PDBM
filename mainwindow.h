@@ -88,7 +88,7 @@ class MainWindow: public QMainWindow{
 
 
 
-private:
+    private:
         Ui::MainWindow *ui;
         QDir dir;
         QValidator *ASCIIonlyValidator, *HexaValidator;
@@ -100,7 +100,7 @@ private:
 
         // passwordsFrame===========================
         std::vector<SiteButton*> siteButtons;
-        SiteButton *currentSiteButton, *siteToDelete_segfaultOverride;
+        SiteButton *currentSiteButton;
         uint32_t nextSiteId=0;
         SiteButton* newSiteButton();
         // /passwordsFrame||||||||||||||||||||||||||

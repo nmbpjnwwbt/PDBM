@@ -79,7 +79,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     hideEverything();
     //on_disableBottomMainWidgetButton_clicked();
     currentSiteButton=0;
-    siteToDelete_segfaultOverride=0;
     ui->loadingFrame->setVisible(1);
     ui->videoWidget->setVisible(0);
     ui->graphicsView->setVisible(0);
@@ -129,7 +128,6 @@ void MainWindow::clearLists(){
         delete item;
     }
     siteButtons.clear();
-    siteToDelete_segfaultOverride=0;
     while((item=ui->scrollFilesHolder->layout()->takeAt(0))){
         delete item->widget();
         delete item;
@@ -350,19 +348,15 @@ void MainWindow::fileButton_clicked(FileButton *button){// todo
     }
 }
 void MainWindow::siteButton_clicked(SiteButton *button){
-    if(siteToDelete_segfaultOverride){
-        delete siteToDelete_segfaultOverride;
-        siteToDelete_segfaultOverride=0;
-    }
     if(static_cast<QApplication*>(QApplication::instance())->keyboardModifiers()&Qt::ShiftModifier){
         if(static_cast<QApplication*>(QApplication::instance())->keyboardModifiers()&Qt::ControlModifier){
             ui->scrollAreaHolder->layout()->removeWidget(button);
-            for(int i=0;1;i++)
+            for(uint32_t i=0; i<siteButtons.size(); i++)
                 if(button==siteButtons[i]){
                     siteButtons.erase(siteButtons.begin()+i);
                     break;
                 }
-            siteToDelete_segfaultOverride=button;
+            button->deleteLater();
             return;
         }
         int index=ui->scrollAreaHolder->layout()->indexOf(button);
@@ -548,7 +542,6 @@ int MainWindow::on_decryptButton_clicked_decrypt(){
         delete item;
     }
     siteButtons.clear();
-    siteToDelete_segfaultOverride=0;
     SiteButton *newsitebutton=0;
     for(uint16_t i=0; i<sitescount; i++){
         newsitebutton=newSiteButton();
@@ -992,7 +985,6 @@ void MainWindow::on_bruter_clicked(){// remove hiding in constructor. NOT MAINTA
         delete item;
     }
     siteButtons.clear();
-    siteToDelete_segfaultOverride=0;
     SiteButton *newsitebutton=0;
     for(uint16_t i=0; i<sitescount; i++){
         newsitebutton=newSiteButton();
