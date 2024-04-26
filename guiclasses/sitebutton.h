@@ -4,16 +4,12 @@
 #include <QLabel>
 #include <QDebug>
 
-typedef void* (*memset_t)(void*, int, size_t);
-
-void cleanse(std::string &in);
-
 class SiteButton: public QFrame{
     Q_OBJECT
 
     public:
         explicit SiteButton(QWidget *parent=0, QString namein="name not loaded", QString descin="desc. not loaded");
-        ~SiteButton();
+        ~SiteButton(){}
 
         void mouseReleaseEvent(QMouseEvent *event);
         void setText(QString namein="name not loaded", QString descriptionin="desc. not loaded");

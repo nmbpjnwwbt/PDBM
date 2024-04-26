@@ -1,14 +1,6 @@
 #include "guiclasses/sitebutton.h"
 #include <QGridLayout>
 
-static volatile memset_t memset_func = memset; // so that it's not optimised out
-
-void cleanse(std::string &in){ // making absolutely sure no data is left in freed memory
-
-    in.resize(in.capacity(), 0);
-    memset_func(&in[0], 0, in.size());
-}
-
 
 SiteButton::SiteButton(QWidget *parent, QString namein, QString descin): QFrame(parent){
     setLayout(new QGridLayout(this));
@@ -21,11 +13,6 @@ SiteButton::SiteButton(QWidget *parent, QString namein, QString descin): QFrame(
     layout()->setContentsMargins(3,3,3,4);
     layout()->setSpacing(4);
     setText(namein, descin);
-}
-SiteButton::~SiteButton(){
-    for(uint32_t i=0; i<4; i++){
-        cleanse(rawdata[i]);
-    }
 }
 
 void SiteButton::mouseReleaseEvent(QMouseEvent *event){
