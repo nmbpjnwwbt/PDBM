@@ -64,24 +64,16 @@ class MainWindow: public QMainWindow{
         void on_bruter_clicked();
         void on_decryptButton_clicked();
         void on_disableBottomMainWidgetButton_clicked();
-        void on_dontAddFileButton_clicked();
         void on_dontAddPasswordButton_clicked();
-        void on_encryptFileButton_clicked();
-        void on_generateKeyButton_clicked();
         void on_generatePasswordButton_clicked();
-        void on_headRoller_3_textEdited(const QString &arg1);
         void on_headRoller_textEdited(const QString &arg1);
         void on_mainOrientationButton_clicked();
         void on_newRecordButton_clicked();
-        void on_newEncryptedFileButton_clicked();
         void on_openFileButton_clicked();
-        void on_overwriteCurrentFileButton_clicked();
         void on_refreshButton_clicked();
-        void on_reloadFileButton_clicked();
         void on_repeatPasswordEdit_textChanged(const QString &arg1 __attribute__((unused)));
         void on_saveButton_clicked();
         void on_showLettersCheckBox_toggled(bool checked);
-        void fileButton_clicked(FileButton *button);
         void siteButton_clicked(SiteButton *button);
 
 
@@ -104,19 +96,6 @@ class MainWindow: public QMainWindow{
         uint32_t nextSiteId=0;
         SiteButton* newSiteButton();
         // /passwordsFrame||||||||||||||||||||||||||
-
-        // filesFrame===============================
-        std::vector<FileButton*> fileButtons;
-        FileButton *currentFileButton, *fileToDelete_segfaultOverride;
-        uint32_t nextFileId=0;
-        std::string fileContents;
-        QGraphicsScene2 *mainGraphicsScene;
-        FileButton* newFileButton();
-        // /filesFrame||||||||||||||||||||||||||||||
-
-        // displayFrame=============================
-        QMediaPlayer *mediaPlayer;
-        // /displayFrame||||||||||||||||||||||||||||
 };
 
 #endif // MAINWINDOW_H

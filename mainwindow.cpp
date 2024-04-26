@@ -99,12 +99,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     ASCIIonlyValidator=new QRegExpValidator(QRegExp("[ -~]*"), this);
     HexaValidator=new QRegExpValidator(QRegExp("([0-9]|[A-F]|[a-f])*"), this);
-    mainGraphicsScene=new QGraphicsScene2(this);
-    mainGraphicsScene->mainView=ui->graphicsView;
-    ui->graphicsView->setScene(mainGraphicsScene);
-    mediaPlayer=new QMediaPlayer(this);
-    mediaPlayer->setVideoOutput(ui->videoWidget);
-    mediaPlayer->setMedia(0);
 
     ui->domainLineEdit->setValidator(ASCIIonlyValidator);
     ui->descriptionLineEdit->setValidator(ASCIIonlyValidator);
@@ -112,7 +106,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     ui->loginLineEdit->setValidator(ASCIIonlyValidator);
     ui->passwordEdit->setValidator(HexaValidator);
     ui->repeatPasswordEdit->setValidator(HexaValidator);
-    ui->keyLineEdit->setValidator(HexaValidator);
 }
 MainWindow::~MainWindow(){
     delete ui;
@@ -126,20 +119,12 @@ void MainWindow::clearLists(){
         delete item;
     }
     siteButtons.clear();
-    while((item=ui->scrollFilesHolder->layout()->takeAt(0))){
-        delete item->widget();
-        delete item;
-    }
-    fileButtons.clear();
-    fileToDelete_segfaultOverride=0;
 }
 void MainWindow::hideEverything(){
     ui->loadingFrame->setVisible(0);
     ui->decryptFrame->setVisible(0);
     ui->passwordsFrame->setVisible(0);
     ui->randomizerFrame->setVisible(0);
-    ui->filesFrame->setVisible(0);
-    ui->fileEditFrame->setVisible(0);
     ui->codingErrorDisplay->setText("");
 }
 SiteButton* MainWindow::newSiteButton(){
@@ -152,17 +137,6 @@ SiteButton* MainWindow::newSiteButton(){
     QObject::connect(siteButtons[siteButtons.size()-1], SIGNAL(clicked(SiteButton *)), this, SLOT(siteButton_clicked(SiteButton *)));
     nextSiteId++;
     return siteButtons[siteButtons.size()-1];
-}
-FileButton* MainWindow::newFileButton(){
-    fileButtons.push_back(0);
-    fileButtons[fileButtons.size()-1]=new FileButton(ui->scrollFiles);
-    ui->scrollFilesHolder->layout()->addWidget(fileButtons[fileButtons.size()-1]);
-    fileButtons[fileButtons.size()-1]->setObjectName("fileButton"+QString::number(nextFileId));
-    fileButtons[fileButtons.size()-1]->setStyleSheet("#fileButton"+QString::number(nextFileId)+"{ border-style: outset;}");
-    fileButtons[fileButtons.size()-1]->setMinimumHeight(10);
-    QObject::connect(fileButtons[fileButtons.size()-1], SIGNAL(clicked(FileButton *)), this, SLOT(fileButton_clicked(FileButton *)));
-    nextFileId++;
-    return fileButtons[fileButtons.size()-1];
 }
 std::string MainWindow::dumpData(){
     std::string output="PDB";
@@ -189,162 +163,7 @@ void MainWindow::removePadding(std::string &input){
     }
     input.erase(input.size()-j);
 }
-void MainWindow::prepareFileForDisplay(){
-    unsigned char pngsignature[8]={137, 'P', 'N', 'G', 13, 10, 26, 10},
-                  bmpsignature[2]={'B', 'M'},
-                  gifsignature[4]={'G', 'I', 'F', '8'},
-                  jpgsignature[3]={255, 0xd8, 255};
 
-
-    QList<QGraphicsItem *> itemsbuflist=mainGraphicsScene->items();
-    QGraphicsItem *itembuf;
-    while(itemsbuflist.isEmpty()==0){
-        itembuf=itemsbuflist.takeFirst();
-        mainGraphicsScene->removeItem(itembuf);
-        delete itembuf;
-    }
-
-    do{
-        bool found=1;
-        for(uint32_t i=0; i<8; i++){
-            if(fileContents[i]==char(pngsignature[i])){
-                continue;
-            }else{
-                found=0;
-                break;
-            }
-        }
-        if(found){// png
-            QByteArray *byteArrayBuf=new QByteArray(QByteArray::fromStdString(fileContents));
-            QImage *imagebuf=new QImage();
-            if(imagebuf->loadFromData(*byteArrayBuf)==0){
-                ui->fileErrorLabel->setText("could not load png file");
-                delete imagebuf;
-                delete byteArrayBuf;
-                break;
-            }
-            delete byteArrayBuf;
-            QPixmap *pixmapbuf=new QPixmap();
-            pixmapbuf->convertFromImage(*imagebuf);
-            delete imagebuf;
-            mainGraphicsScene->addPixmap(*pixmapbuf);
-            delete pixmapbuf;
-            mainGraphicsScene->setSceneRect(mainGraphicsScene->itemsBoundingRect());
-            ui->videoWidget->setVisible(0);
-            ui->graphicsView->setVisible(1);
-
-
-            break;
-        }else found=1;
-        for(uint32_t i=0; i<2; i++){
-            if(fileContents[i]==bmpsignature[i])
-                continue;
-            else{
-                found=0;
-                break;
-            }
-        }
-        if(found){// bmp
-            QByteArray *byteArrayBuf=new QByteArray(QByteArray::fromStdString(fileContents));
-            QImage *imagebuf=new QImage();
-            if(imagebuf->loadFromData(*byteArrayBuf)==0){
-                ui->fileErrorLabel->setText("could not load bmp file");
-                delete imagebuf;
-                delete byteArrayBuf;
-                break;
-            }
-            delete byteArrayBuf;
-            QPixmap *pixmapbuf=new QPixmap();
-            pixmapbuf->convertFromImage(*imagebuf);
-            delete imagebuf;
-            mainGraphicsScene->addPixmap(*pixmapbuf);
-            delete pixmapbuf;
-            mainGraphicsScene->setSceneRect(mainGraphicsScene->itemsBoundingRect());
-            ui->videoWidget->setVisible(0);
-            ui->graphicsView->setVisible(1);
-
-
-            break;
-        }else found=1;
-        for(uint32_t i=0; i<4; i++){
-            if(fileContents[i]==gifsignature[i])
-                continue;
-            else{
-                found=0;
-                break;
-            }
-        }
-        if(found){// gif
-            ui->videoWidget->setVisible(1);
-            ui->graphicsView->setVisible(0);
-
-            break;
-        }else found=1;
-        for(uint32_t i=0; i<3; i++){
-            if(fileContents[i]==jpgsignature[i])
-                continue;
-            else{
-                found=0;
-                break;
-            }
-        }
-        if(found){// jpg
-
-            break;
-        }else found=1;
-    }while(0);
-}
-
-void MainWindow::fileButton_clicked(FileButton *button){// todo
-    if(fileToDelete_segfaultOverride){
-        delete fileToDelete_segfaultOverride;
-        fileToDelete_segfaultOverride=0;
-    }
-    if(static_cast<QApplication*>(QApplication::instance())->keyboardModifiers()&Qt::ShiftModifier){
-        if(static_cast<QApplication*>(QApplication::instance())->keyboardModifiers()&Qt::ControlModifier){
-            ui->scrollFilesHolder->layout()->removeWidget(button);
-            for(int i=0;1;i++)
-                if(button==fileButtons[i]){
-                    fileButtons.erase(fileButtons.begin()+i);
-                    break;
-                }
-            fileToDelete_segfaultOverride=button;
-            return;
-        }
-        int index=ui->scrollFilesHolder->layout()->indexOf(button);
-        if(index==0){
-            ui->scrollFilesHolder->layout()->removeWidget(button);
-            ui->scrollFilesHolder->layout()->addWidget(button);
-        }else{
-            ui->scrollFilesHolder->layout()->removeWidget(button);
-            reinterpret_cast<QBoxLayout*>(ui->scrollFilesHolder->layout())->insertWidget(index-1, button);
-        }
-    }else
-    if(static_cast<QApplication*>(QApplication::instance())->keyboardModifiers()&Qt::ControlModifier){
-        uint32_t index=ui->scrollFilesHolder->layout()->indexOf(button);
-        if(index==fileButtons.size()-1){
-            ui->scrollFilesHolder->layout()->removeWidget(button);
-            reinterpret_cast<QBoxLayout*>(ui->scrollFilesHolder->layout())->insertWidget(0, button);
-            return;
-        }
-        ui->scrollFilesHolder->layout()->removeWidget(button);
-        reinterpret_cast<QBoxLayout*>(ui->scrollFilesHolder->layout())->insertWidget(index+1, button);
-    }else{
-        hideEverything();
-        ui->fileEditFrame->setVisible(1);
-        currentFileButton=button;
-        ui->keyLineEdit->setText(QString::fromStdString(button->keyToHex()));
-        ui->pathLineEdit->setText(button->path->text());
-        ui->fileDescLineEdit->setText(QString::fromStdString(button->description));
-        /*
-        //ui->randomizerFrame->setVisible(1);
-        //currentSiteButton=button;
-        ui->domainLineEdit->setText(QString::fromStdString(button->rawdata[0]));
-        ui->descriptionLineEdit->setText(QString::fromStdString(button->rawdata[1]));
-        ui->loginLineEdit->setText(QString::fromStdString(button->rawdata[2]));
-        ui->passwordLineEdit->setText(QString::fromStdString(button->rawdata[3]));*/
-    }
-}
 void MainWindow::siteButton_clicked(SiteButton *button){
     if(static_cast<QApplication*>(QApplication::instance())->keyboardModifiers()&Qt::ShiftModifier){
         if(static_cast<QApplication*>(QApplication::instance())->keyboardModifiers()&Qt::ControlModifier){
@@ -397,8 +216,6 @@ void MainWindow::on_actionNewDataBase_triggered(){
 }
 void MainWindow::on_actionNewKeyVector_triggered(){
     hideEverything();
-    ui->filesFrame->setVisible(1);
-    ui->filenameKLabel->setText("new");
     if(!ui->dontClearPasswordBox->isChecked()){
         ui->passwordEdit->setText("");
         ui->repeatPasswordEdit->setText("");
@@ -624,61 +441,9 @@ int MainWindow::on_decryptButton_clicked_encrypt(){
 void MainWindow::on_disableBottomMainWidgetButton_clicked(){
     ui->bottomMainWidget->setVisible(0);
 }
-void MainWindow::on_dontAddFileButton_clicked(){
-    hideEverything();
-    ui->filesFrame->setVisible(1);
-}
 void MainWindow::on_dontAddPasswordButton_clicked(){
     hideEverything();
     ui->passwordsFrame->setVisible(1);
-}
-void MainWindow::on_encryptFileButton_clicked(){// todo
-
-    ui->overwriteCurrentFileButton->setFocus();
-}
-void MainWindow::on_generateKeyButton_clicked(){
-    ui->keyLineEdit->clear();
-    uint8_t letter[16]={'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-    QString newpassword="";
-    uint8_t randing;
-    if(ui->useRollerGenerator->isChecked()){
-        if(looped<16){
-            ui->fileErrorLabel->setText("too little rolling, do more");
-            return;
-        }
-        std::mt19937 rander;
-        rander.seed(randomized);
-        for(uint16_t i=0; i<ui->keyLengthBox->value(); i++){
-            randing=rander()&15;
-            newpassword+=letter[randing];
-        }
-        randomized=rander();
-        looped+=(ui->keyLengthBox->value()+1)*8;
-        ui->rollCounter->setText(QString::number(looped/8));
-        ui->rollCounter_2->setText(QString::number(looped/8));
-    }else{
-        #ifdef USE_PYTHON_CRYPTO
-            boost::python::object pyobj;
-            for(uint16_t i=0; i<ui->keyLengthBox->value(); i++){
-                boost::python::exec("randing=Random.new().read(1)", main_namespace);
-                randing=std::string(boost::python::extract<std::string>(main_namespace["randing"]))[0];
-                randing&=15;
-                newpassword+=letter[randing];
-            }
-        #elif defined(USE_CRYPTOPP)
-            CryptoPP::AutoSeededRandomPool rnd;
-
-            for(uint16_t i=0; i<ui->keyLengthBox->value(); i++){
-                randing=rnd.GenerateByte();
-                randing&=15;
-                newpassword+=letter[randing];
-            }
-        #else
-            newpassword="Feature depends on cryptographic library. Use alternative method instead.";
-        #endif
-
-    }
-    ui->keyLineEdit->setText(newpassword);
 }
 void MainWindow::on_generatePasswordButton_clicked(){
     int variety=0;
@@ -719,7 +484,6 @@ void MainWindow::on_generatePasswordButton_clicked(){
         randomized=rander();
         looped+=(ui->passwordLengthBox->value()+1)*8;
         ui->rollCounter->setText(QString::number(looped/8));
-        ui->rollCounter_2->setText(QString::number(looped/8));
     }else{
         #ifdef USE_PYTHON_CRYPTO
             boost::python::object pyobj;
@@ -752,19 +516,6 @@ void MainWindow::on_generatePasswordButton_clicked(){
     }
     if(ui->passwordLineEdit->isVisible())
         ui->passwordLineEdit->setText(newpassword);
-    if(ui->keyLineEdit->isVisible())
-        ui->keyLineEdit->setText(newpassword);
-}
-void MainWindow::on_headRoller_3_textEdited(const QString &arg1){
-    uint8_t buffer=randomized>>28;
-    if(arg1.size()!=1)
-        ui->fileErrorLabel->setText("weird headRoll input: "+arg1);
-    randomized^=arg1[0].toLatin1()&15;
-    randomized=(randomized<<4)+buffer;
-    looped++;
-    ui->rollCounter->setText(QString::number(looped/8));
-    ui->rollCounter_2->setText(QString::number(looped/8));
-    ui->headRoller_3->clear();
 }
 void MainWindow::on_headRoller_textEdited(const QString &arg1){
     uint8_t buffer=randomized>>28;
@@ -774,7 +525,6 @@ void MainWindow::on_headRoller_textEdited(const QString &arg1){
     randomized=(randomized<<4)+buffer;
     looped++;
     ui->rollCounter->setText(QString::number(looped/8));
-    ui->rollCounter_2->setText(QString::number(looped/8));
     ui->headRoller->clear();
 }
 void MainWindow::on_mainOrientationButton_clicked(){
@@ -785,10 +535,6 @@ void MainWindow::on_mainOrientationButton_clicked(){
         ui->mainSplitter->setOrientation(Qt::Horizontal);
         ui->viewEditorSplitter->setOrientation(Qt::Vertical);
     }
-}
-void MainWindow::on_newEncryptedFileButton_clicked(){
-    FileButton *fbbuf=newFileButton();
-    fbbuf->validityCheck();
 }
 void MainWindow::on_newRecordButton_clicked(){
     hideEverything();
@@ -814,40 +560,6 @@ void MainWindow::on_openFileButton_clicked(){
         ui->decryptButton->setStyleSheet("");
     }
 }
-void MainWindow::on_overwriteCurrentFileButton_clicked(){
-    bool checkfine=1;
-
-    ui->keyLineEdit->setStyleSheet("");
-    ui->pathLineEdit->setStyleSheet("");
-    ui->fileErrorLabel->setText("");
-    if(currentFileButton->hexToKey(ui->keyLineEdit->text().toStdString(), ui->fileErrorLabel)){
-        ui->keyLineEdit->setStyleSheet("QLineEdit{ background-color: #601010; }");
-        checkfine=0;
-    }
-    if(ui->pathLineEdit->text().length()==0){
-        ui->pathLineEdit->setStyleSheet("QLineEdit{ background-color: #601010; }");
-        ui->fileErrorLabel->setText("path can not be empty");
-        checkfine=0;
-    }else{
-        std::fstream file;
-        std::string filename=ui->pathLineEdit->text().toStdString();
-        file.open(filename, std::ios::in|std::ios::binary);
-        if(file.good()==0){
-            ui->pathLineEdit->setStyleSheet("QLineEdit{ background-color: #601010; }");
-            ui->fileErrorLabel->setText("could not open file, check the path");
-            checkfine=0;
-        }
-    }
-
-    if(checkfine){
-        currentFileButton->description=ui->fileDescLineEdit->text().toStdString();
-        currentFileButton->key=ui->keyLineEdit->text().toStdString();
-        currentFileButton->path->setText(ui->pathLineEdit->text());
-        currentFileButton->validityCheck(1);
-        hideEverything();
-        ui->filesFrame->setVisible(1);
-    }
-}
 void MainWindow::on_refreshButton_clicked(){
     if(!dir.exists((path+"db").c_str())){
         dir.mkdir((path+"db").c_str());
@@ -862,26 +574,6 @@ void MainWindow::on_refreshButton_clicked(){
         }
     }
     dir.cdUp();
-}
-void MainWindow::on_reloadFileButton_clicked(){
-    std::fstream file;
-    std::string line, path=ui->pathLineEdit->text().toStdString();
-    file.open(path, std::ios::in|std::ios::binary);
-    if(file.good()){
-        if(ui->keyLineEdit->text().length()){
-
-        }else{// load plaintext
-            fileContents="";
-            while(getline(file, line)){
-                fileContents+=line+'\n';
-            }
-            file.close();
-            fileContents.pop_back();
-            prepareFileForDisplay();
-        }
-    }else{
-        ui->fileErrorLabel->setText("could not open file");
-    }
 }
 void MainWindow::on_repeatPasswordEdit_textChanged(const QString &arg1 __attribute__((unused))){
     if((ui->repeatPasswordEdit->text().size()==0)||(ui->repeatPasswordEdit->text()==ui->passwordEdit->text())){
