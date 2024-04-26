@@ -96,6 +96,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     reinterpret_cast<QGridLayout*>(ui->possibleCharsScroll->layout())->setColumnStretch(12,1);
 
     connect(ui->passwordEdit, &QLineEdit::textChanged, this, &MainWindow::on_repeatPasswordEdit_textChanged);
+    connect(ui->dbList, &QListWidget::itemActivated, this, &MainWindow::on_openFileButton_clicked);
 
     ASCIIonlyValidator=static_cast<QValidator*>(new QRegExpValidator(QRegExp("[ -~]*")));
     HexaValidator=static_cast<QValidator*>(new QRegExpValidator(QRegExp("([0-9]|[A-F]|[a-f])*")));
