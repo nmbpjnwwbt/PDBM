@@ -43,7 +43,6 @@ class MainWindow: public QMainWindow{
         void addPadding(std::string &input);
         void removePadding(std::string &input);
         void prepareFileForDisplay();// make sure to load it to fileContents first
-        inline void hardClearStr(std::string &in);
 
         int on_decryptButton_clicked_decrypt();
         int on_decryptButton_clicked_encrypt();
@@ -93,16 +92,19 @@ private:
         Ui::MainWindow *ui;
         QDir dir;
         QValidator *ASCIIonlyValidator, *HexaValidator;
+
         // randomizerFrame==========================
         QRadioButton2 *charRadioButton[95];
         uint32_t randomized=0, looped=0;
         // /randomizerFrame|||||||||||||||||||||||||
+
         // passwordsFrame===========================
         std::vector<SiteButton*> siteButtons;
         SiteButton *currentSiteButton, *siteToDelete_segfaultOverride;
         uint32_t nextSiteId=0;
         SiteButton* newSiteButton();
         // /passwordsFrame||||||||||||||||||||||||||
+
         // filesFrame===============================
         std::vector<FileButton*> fileButtons;
         FileButton *currentFileButton, *fileToDelete_segfaultOverride;
@@ -111,6 +113,7 @@ private:
         QGraphicsScene2 *mainGraphicsScene;
         FileButton* newFileButton();
         // /filesFrame||||||||||||||||||||||||||||||
+
         // displayFrame=============================
         QMediaPlayer *mediaPlayer;
         // /displayFrame||||||||||||||||||||||||||||

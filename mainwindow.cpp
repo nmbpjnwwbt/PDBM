@@ -298,10 +298,6 @@ void MainWindow::prepareFileForDisplay(){
         }else found=1;
     }while(0);
 }
-inline void MainWindow::hardClearStr(std::string &in){
-    in.replace(0, in.size(), in.size(), int8_t(0));
-    in.clear();
-}
 
 void MainWindow::fileButton_clicked(FileButton *button){// todo
     if(fileToDelete_segfaultOverride){
