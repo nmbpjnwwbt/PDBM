@@ -97,8 +97,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->passwordEdit, &QLineEdit::textChanged, this, &MainWindow::on_repeatPasswordEdit_textChanged);
     connect(ui->dbList, &QListWidget::itemActivated, this, &MainWindow::on_openFileButton_clicked);
 
-    ASCIIonlyValidator=static_cast<QValidator*>(new QRegExpValidator(QRegExp("[ -~]*")));
-    HexaValidator=static_cast<QValidator*>(new QRegExpValidator(QRegExp("([0-9]|[A-F]|[a-f])*")));
+    ASCIIonlyValidator=new QRegExpValidator(QRegExp("[ -~]*"), this);
+    HexaValidator=new QRegExpValidator(QRegExp("([0-9]|[A-F]|[a-f])*"), this);
     mainGraphicsScene=new QGraphicsScene2(this);
     mainGraphicsScene->mainView=ui->graphicsView;
     ui->graphicsView->setScene(mainGraphicsScene);
@@ -116,8 +116,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 }
 MainWindow::~MainWindow(){
     delete ui;
-    delete ASCIIonlyValidator;
-    delete HexaValidator;
 }
 
 
